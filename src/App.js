@@ -1,9 +1,14 @@
 import React from 'react';
 
+// Components
+import QuickDataArea from './components/QuickDataArea/QuickDataArea';
 
 function App() {
   return (
-    <div>Hello</div>
+    <React.Fragment>
+      <div>Hello</div>
+      <QuickDataArea />
+    </React.Fragment>
   );
 }
 
