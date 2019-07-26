@@ -54,7 +54,7 @@ export class QuickDataArea extends React.Component {
     let leadText = text.substring(0, caretIndex + 1);
     if (leadText.indexOf(' ') > 0) {
       var words = leadText.split(' ');
-      lastWord = words[words.length - 1]; 
+      lastWord = words[words.length - 1];
     } else {
       lastWord = leadText;
     }
@@ -86,6 +86,7 @@ export class QuickDataArea extends React.Component {
         caretX: caretX,
         caretY: caretY,
         caretIndex: caretIndex,
+        activeSuggestion: 0,
         showSuggestions: false,
         filteredSuggestions: [],
         textAreaValue: textAreaValue
@@ -117,6 +118,41 @@ export class QuickDataArea extends React.Component {
     quickTextArea.selectionEnd = updatedText.length;
   };
 
+  handleKeyDown = e => {
+    const { activeSuggestion, filteredSuggestions } = this.state;
+    // User pressed the enter key, update the input and close the
+    // suggestions
+    if ((e.keyCode === 13 || e.keyCode === 9) && filteredSuggestions.length > 0) {
+      e.preventDefault();
+      let quickTextArea = document.getElementById('quickArea');
+      let updatedText = this.injectAutoCompleteValue(filteredSuggestions[activeSuggestion]);
+      this.setState({
+        activeSuggestion: 0,
+        filteredSuggestions: [],
+        showSuggestions: false,
+        textAreaValue: updatedText
+      });
+      quickTextArea.selectionStart = updatedText.length;
+      quickTextArea.selectionEnd = updatedText.length;
+    }
+    // User pressed the up arrow, decrement the index
+    else if (e.keyCode === 38) {
+      if (activeSuggestion === 0) {
+        return;
+      }
+
+      this.setState({ activeSuggestion: activeSuggestion - 1 });
+    }
+    // User pressed the down arrow, increment the index
+    else if (e.keyCode === 40) {
+      if (activeSuggestion - 1 === filteredSuggestions.length) {
+        return;
+      }
+
+      this.setState({ activeSuggestion: activeSuggestion + 1 });
+    }
+  };
+
   updateCaretPosition(event) {
     let caretIndex = event.target.selectionStart;
     let caret = getCursorXY(event.target, event.target.selectionStart);
@@ -132,12 +168,16 @@ export class QuickDataArea extends React.Component {
         <button style={{ display: 'block' }} onClick={this.initializeFormFields}>
           Initialize Form
         </button>
-        <TextArea id="quickArea" value={this.state.textAreaValue} onChange={event => this.detectAutoComplete(event)} />
+        <TextArea id="quickArea" 
+          value={this.state.textAreaValue} 
+          onChange={event => this.detectAutoComplete(event)}
+          onKeyDown={event => this.handleKeyDown(event)} />
         <QuickOptionsList
           caretX={this.state.caretX}
           caretY={this.state.caretY}
           filteredOptions={this.state.filteredSuggestions}
           selectOption={this.selectOption}
+          selectedIndex={this.state.activeSuggestion}
         />
       </React.Fragment>
     );

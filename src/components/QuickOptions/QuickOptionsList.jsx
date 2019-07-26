@@ -17,12 +17,18 @@ const OptionList = styled.div`
 `;
 
 export const QuickOptionsList = props => {
-  let { filteredOptions } = props;
+  let { filteredOptions, selectedIndex } = props;
   let renderList = [];
-
   if (filteredOptions && filteredOptions.length > 0) {
     renderList = filteredOptions.map((field, index) => {
-      return <QuickOption key={index} selectOption={props.selectOption} option={field} />;
+      return (
+        <QuickOption
+          key={index}
+          isSelected={index === selectedIndex}
+          selectOption={props.selectOption}
+          option={field}
+        />
+      );
     });
   }
 
