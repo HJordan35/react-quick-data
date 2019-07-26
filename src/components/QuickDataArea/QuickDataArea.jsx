@@ -24,8 +24,11 @@ export class QuickDataArea extends React.Component {
     this.state = {
       caretX: 0,
       caretY: 0,
+      caretIndex: 0,
       fieldManifest: {},
-      hashWord: ''
+      activeSuggestion: 0,
+      filteredSuggestions: [],
+      textAreaValue: ''
     };
   }
 
@@ -43,30 +46,84 @@ export class QuickDataArea extends React.Component {
     }
   };
 
+  detectAutoComplete = event => {
+    let { caretX, caretY, caretIndex } = this.updateCaretPosition(event);
+    let lastWord = '',
+      hashWord;
+    let text = event.target.value;
+    let leadText = text.substring(0, caretIndex + 1);
+    if (leadText.indexOf(' ') > 0) {
+      var words = leadText.split(' ');
+      lastWord = words[words.length - 1]; 
+    } else {
+      lastWord = leadText;
+    }
+
+    let matches = lastWord.match(/#(.+)$/i);
+    hashWord = matches ? matches[1] : '';
+
+    this.setFilterFieldOptions(event.target.value, hashWord, caretX, caretY, caretIndex);
+  };
+
+  setFilterFieldOptions = (textAreaValue, hashWord, caretX, caretY, caretIndex) => {
+    if (hashWord) {
+      const fieldList = Object.keys(this.state.fieldManifest);
+      const filteredSuggestions = fieldList.filter(
+        suggestion => suggestion.toLowerCase().indexOf(hashWord.toLowerCase()) > -1
+      );
+
+      this.setState({
+        caretX: caretX,
+        caretY: caretY,
+        caretIndex: caretIndex,
+        activeSuggestion: 0,
+        filteredSuggestions,
+        showSuggestions: true,
+        textAreaValue: textAreaValue
+      });
+    } else {
+      this.setState({
+        caretX: caretX,
+        caretY: caretY,
+        caretIndex: caretIndex,
+        showSuggestions: false,
+        filteredSuggestions: [],
+        textAreaValue: textAreaValue
+      });
+    }
+  };
+
+  injectAutoCompleteValue = selection => {
+    let text = this.state.textAreaValue;
+    let leadText = text.substring(0, this.state.caretIndex);
+    let hashWords = leadText.split('#');
+    let truncLength = hashWords[hashWords.length - 1].length;
+
+    text = text.substring(0, text.length - truncLength);
+    return text.concat(`${selection}: `);
+  };
+
+  selectOption = event => {
+    let quickTextArea = document.getElementById('quickArea');
+    let updatedText = this.injectAutoCompleteValue(event.currentTarget.innerText);
+    this.setState({
+      activeSuggestion: 0,
+      filteredSuggestions: [],
+      showSuggestions: false,
+      textAreaValue: updatedText
+    });
+    quickTextArea.focus();
+    quickTextArea.selectionStart = updatedText.length;
+    quickTextArea.selectionEnd = updatedText.length;
+  };
+
   updateCaretPosition(event) {
+    let caretIndex = event.target.selectionStart;
     let caret = getCursorXY(event.target, event.target.selectionStart);
     let xPX = caret.x.toString() + 'px';
     let yPX = caret.y.toString() + 'px';
 
-    this.setState({ caretX: xPX, caretY: yPX });
-  }
-
-  detectAutoComplete(event) {
-    this.updateCaretPosition(event);
-    let element = document.getElementById('1234');
-    let lastWord = '',
-      caretPos;
-    if (window.getSelection) {
-      caretPos = element.selectionStart;
-      let text = event.target.value;
-      let leadText = text.substring(0, caretPos);
-      if (leadText.indexOf(' ') > 0) {
-        var words = leadText.split(' ');
-        lastWord = words[words.length - 1]; //return last word
-      }
-    }
-    let matches = lastWord.match(/#(.+)$/i);
-    if (matches) this.setState({ hashWord: matches[1] });
+    return { caretX: xPX, caretY: yPX, caretIndex: caretIndex };
   }
 
   render() {
@@ -75,12 +132,12 @@ export class QuickDataArea extends React.Component {
         <button style={{ display: 'block' }} onClick={this.initializeFormFields}>
           Initialize Form
         </button>
-        <TextArea id="1234" onChange={event => this.detectAutoComplete(event)} />
+        <TextArea id="quickArea" value={this.state.textAreaValue} onChange={event => this.detectAutoComplete(event)} />
         <QuickOptionsList
           caretX={this.state.caretX}
           caretY={this.state.caretY}
-          fieldManifest={this.state.fieldManifest}
-          hashWord={this.state.hashWord}
+          filteredOptions={this.state.filteredSuggestions}
+          selectOption={this.selectOption}
         />
       </React.Fragment>
     );

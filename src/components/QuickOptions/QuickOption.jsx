@@ -12,7 +12,7 @@ const Option = styled.div`
 `;
 
 export const QuickOption = props => {
-  return <Option>{props.option}</Option>;
+  return <Option onClick={event => props.selectOption(event)}>{props.option}</Option>;
 };
 
 QuickOption.propTypes = {};

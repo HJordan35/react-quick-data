@@ -17,20 +17,16 @@ const OptionList = styled.div`
 `;
 
 export const QuickOptionsList = props => {
-  const fieldList = Object.keys(props.fieldManifest);
+  let { filteredOptions } = props;
   let renderList = [];
 
-  if (fieldList) {
-    renderList = fieldList.map(field => {
-      return <QuickOption option={field} />;
+  if (filteredOptions && filteredOptions.length > 0) {
+    renderList = filteredOptions.map((field, index) => {
+      return <QuickOption key={index} selectOption={props.selectOption} option={field} />;
     });
   }
 
-  return (
-    <OptionList {...props}>
-      {renderList}
-    </OptionList>
-  );
+  return <OptionList {...props}>{renderList}</OptionList>;
 };
 
 QuickOptionsList.propTypes = {};
