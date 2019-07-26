@@ -6,8 +6,8 @@ import styled from 'styled-components';
 import QuickOptionsList from '../QuickOptions/QuickOptionsList';
 
 // Utilities
-import {getCursorXY} from '../../utilities/coordinateUtilities';
-import {constructFormManifest} from '../../utilities/formUtilities';
+import { getCursorXY } from '../../utilities/coordinateUtilities';
+import { constructFormManifest } from '../../utilities/formUtilities';
 
 const TextArea = styled.textarea`
   overflow: scroll;
@@ -22,9 +22,10 @@ export class QuickDataArea extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-         caretX: 0,
-         caretY: 0,
-         fieldManifest: {}
+      caretX: 0,
+      caretY: 0,
+      fieldManifest: {},
+      hashWord: ''
     };
   }
 
@@ -34,31 +35,53 @@ export class QuickDataArea extends React.Component {
 
   initializeFormFields = () => {
     const { formId } = this.props;
-    if(formId) {
+    if (formId) {
       let form = document.getElementById(formId);
       let fieldList = [...form];
       let formManifest = constructFormManifest(fieldList);
-      this.setState({fieldManifest: formManifest})
-      console.log(formManifest);
+      this.setState({ fieldManifest: formManifest });
     }
-  }
+  };
 
   updateCaretPosition(event) {
-    // let caret = getCaretCoordinates(event.target, event.target.selectionEnd);
-   let caret = getCursorXY(event.target, event.target.selectionStart);
-   let xPX = caret.x.toString() + "px";
-   let yPX = caret.y.toString() + "px";
+    let caret = getCursorXY(event.target, event.target.selectionStart);
+    let xPX = caret.x.toString() + 'px';
+    let yPX = caret.y.toString() + 'px';
 
-   this.setState({caretX: xPX, caretY: yPX});
-    console.log(caret);
+    this.setState({ caretX: xPX, caretY: yPX });
+  }
+
+  detectAutoComplete(event) {
+    this.updateCaretPosition(event);
+    let element = document.getElementById('1234');
+    let lastWord = '',
+      caretPos;
+    if (window.getSelection) {
+      caretPos = element.selectionStart;
+      let text = event.target.value;
+      let leadText = text.substring(0, caretPos);
+      if (leadText.indexOf(' ') > 0) {
+        var words = leadText.split(' ');
+        lastWord = words[words.length - 1]; //return last word
+      }
+    }
+    let matches = lastWord.match(/#(.+)$/i);
+    if (matches) this.setState({ hashWord: matches[1] });
   }
 
   render() {
     return (
       <React.Fragment>
-        <button style={{display: 'block'}} onClick={this.initializeFormFields}>Initialize Form</button>
-        <TextArea onChange={event => this.updateCaretPosition(event)} />
-        <QuickOptionsList caretX={this.state.caretX} caretY={this.state.caretY} fieldManifest={this.state.fieldManifest}/>
+        <button style={{ display: 'block' }} onClick={this.initializeFormFields}>
+          Initialize Form
+        </button>
+        <TextArea id="1234" onChange={event => this.detectAutoComplete(event)} />
+        <QuickOptionsList
+          caretX={this.state.caretX}
+          caretY={this.state.caretY}
+          fieldManifest={this.state.fieldManifest}
+          hashWord={this.state.hashWord}
+        />
       </React.Fragment>
     );
   }

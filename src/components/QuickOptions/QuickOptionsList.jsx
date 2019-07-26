@@ -15,10 +15,10 @@ const OptionList = styled.div`
   left: 16px;
   box-sizing: content-box;
 `;
+
 export const QuickOptionsList = props => {
   const fieldList = Object.keys(props.fieldManifest);
   let renderList = [];
-  console.log(props.fieldManifest);
 
   if (fieldList) {
     renderList = fieldList.map(field => {
