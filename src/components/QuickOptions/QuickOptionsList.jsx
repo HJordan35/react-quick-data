@@ -11,8 +11,8 @@ const OptionList = styled.div`
   border-radius: 8px;
   box-shadow: 0px 0px 12px lightgray;
   position: absolute;
-  top: calc(${props => props.caretY} + 14px);
-  left: 16px;
+  top: calc(${props => props.caretY});
+  left: calc(${props => props.caretX} - 18px);
   box-sizing: content-box;
 `;
 

@@ -16,6 +16,7 @@ const TextArea = styled.textarea`
   border: 1px solid lightgray;
   border-radius: 15px;
   width: 300px;
+  height: 500px;
 `;
 
 export class QuickDataArea extends React.Component {
