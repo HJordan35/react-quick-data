@@ -1,3 +1,19 @@
+## REACT QUICK DATA COMPONENT
+This component is a UX experiment to determine if there is a faster way for users to complete forms. 
+
+The burden of form data entry is especially apparent in areas such as customer service, where users of systems interact with the same forms on a daily basis. Even though the form remains consistent - the cadence, speed, and format in which they *receive* the data to be entered into the form varies from case to case. As a result, I have witnessed customer service reps capturing all information collected from a caller *on paper* while on the call - only to go through and re-enter the data into the digital form after the call is ended. As the complexity, and density of forms increases, it becomes harder and harder to traverse them quickly and efficiently. 
+
+The quick data entry component aims to address the main issue experienced during data entry
+- Allow entry of any field, at any time, in any order
+
+*Try it out by running the app and using the '#' sign to initiate the autocomplete for each field*
+<p align="center">
+    <img width="640" src="demo/quick_data_demo.gif">
+</p>
+
+
+
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
